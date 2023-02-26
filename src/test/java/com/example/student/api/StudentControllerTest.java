@@ -1,6 +1,7 @@
 package com.example.student.api;
 
 import com.example.student.StudentRepository;
+import com.example.student.StudentService;
 import com.example.student.domain.Gender;
 import com.example.student.domain.Student;
 import org.assertj.core.util.TriFunction;
@@ -31,15 +32,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class StudentControllerTest {
 
   @MockBean
+  StudentService studentService;
+
+  @MockBean
   StudentRepository studentRepository;
+
 
   @Autowired
   MockMvc mockMvc;
 
+
   @Test
   void shouldReturn200OkAndStudentsList() throws Exception {
 
-    when(studentRepository.findAll()).thenReturn(
+    when(studentService.getStudents()).thenReturn(
         Arrays.asList(
             new Student(1L, "Omar", "omar@email.com", Gender.MALE),
             new Student(2L, "Nada", "nada@email.com", Gender.FEMALE)
