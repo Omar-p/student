@@ -1,25 +1,36 @@
 package com.example.student.api;
 
-import com.example.student.domain.Gender;
+import com.example.student.StudentService;
 import com.example.student.domain.Student;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/students")
 public class StudentController {
 
+  private final StudentService studentService;
+
+  public StudentController(StudentService studentService) {
+    this.studentService = studentService;
+  }
+
+
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Student> students() {
-    return Arrays.asList(
-        new Student(1L, "Omar", "omar@email.com", Gender.MALE),
-        new Student(1L, "Nada", "nada@email.com", Gender.FEMALE)
-    );
+    return studentService.getStudents();
+  }
+
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void createNewStudent(@RequestBody @Valid Student student) {
+    studentService.addStudent(student);
+  }
+
+  @DeleteMapping(path = "{studentId}")
+  public void deleteStudent(@PathVariable("studentId") Long studentId) {
+    studentService.deleteStudent(studentId);
   }
 }
