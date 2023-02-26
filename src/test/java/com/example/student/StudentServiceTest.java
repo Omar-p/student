@@ -5,7 +5,6 @@ import com.example.student.domain.Student;
 import com.example.student.exception.EmailIsAlreadyExistException;
 import com.example.student.exception.StudentNotFoundException;
 import org.assertj.core.api.BDDAssertions;
-import org.assertj.core.api.ThrowableAssertAlternative;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @MockitoSettings
@@ -28,23 +26,20 @@ class StudentServiceTest {
 
   Student student;
 
-  Student persistedStudent;
-
   @BeforeEach
   void setUp() {
     student = new Student(null, "name", "name@email.com", Gender.MALE);
-    persistedStudent = new Student(1L, "name", "name@email.com", Gender.MALE);
-
   }
 
   @Test
   void itShouldAddStudent() {
+    Student persistedStudent = new Student(1L, "name", "name@email.com", Gender.MALE);
 
     when(studentRepository.existsByEmail(student.getEmail())).thenReturn(false);
     when(studentRepository.save(student)).thenReturn(persistedStudent);
 
-
-    studentServiceUnderTest.addStudent(student);
+    BDDAssertions.assertThatNoException()
+        .isThrownBy(() -> studentServiceUnderTest.addStudent(student));
   }
 
   @Test
@@ -52,9 +47,9 @@ class StudentServiceTest {
     when(studentRepository.existsByEmail(student.getEmail())).thenReturn(true);
 
     BDDAssertions.assertThatRuntimeException()
-            .isThrownBy(() -> studentServiceUnderTest.addStudent(student))
-            .isInstanceOf(EmailIsAlreadyExistException.class)
-            .withMessageContaining("is taken");
+        .isThrownBy(() -> studentServiceUnderTest.addStudent(student))
+        .isInstanceOf(EmailIsAlreadyExistException.class)
+        .withMessageContaining("is taken");
   }
 
   @Test
